@@ -128,10 +128,10 @@ local sse_state = {
 	job_id = nil,
 }
 
----Handle SSE data stream
+---Handle SSE data stream and invoke callback for each complete event
 ---@param data table
----@return table|nil
-local function handle_sse(data)
+---@param callback fun(response: table)|nil
+local function handle_sse(data, callback)
 	for _, line in ipairs(data) do
 		if line ~= "" then
 			local clean_line = (line:gsub("^data: ?", ""))
@@ -141,9 +141,9 @@ local function handle_sse(data)
 			sse_state.buffer = {}
 
 			local ok, response = pcall(vim.fn.json_decode, full_event)
-			if ok then
-				return response
-			else
+			if ok and callback then
+				callback(response)
+			elseif not ok then
 				vim.notify("SSE JSON decode error: " .. full_event, vim.log.levels.ERROR, { title = "opencode" })
 			end
 		end
@@ -177,10 +177,7 @@ local function listen_to_sse(port, callback)
 		local stderr_lines = {}
 		local job_id = vim.fn.jobstart(command, {
 			on_stdout = function(_, data)
-				local response = handle_sse(data)
-				if response and callback then
-					callback(response)
-				end
+				handle_sse(data, callback)
 			end,
 			on_stderr = function(_, data)
 				if data then
