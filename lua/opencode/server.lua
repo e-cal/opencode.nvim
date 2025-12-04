@@ -1,3 +1,5 @@
+local config = require("opencode.config")
+
 ---Execute a shell command and return output
 ---@param command string
 ---@return string
@@ -81,11 +83,16 @@ local function is_descendant_of_neovim(pid)
 	return false
 end
 
+local M = {}
+
 ---Find OpenCode server in Neovim's CWD
 ---@return table {pid: number, port: number, cwd: string}
-local function find_server_inside_nvim_cwd()
+function M.find_server_inside_nvim_cwd()
 	local found_server
 	local nvim_cwd = vim.fn.getcwd()
+    if config.get("debug") then
+        print("Neovim CWD: " .. nvim_cwd)
+    end
 	for _, server in ipairs(find_servers()) do
 		if server.cwd:find(nvim_cwd, 1, true) == 1 then
 			found_server = server
@@ -96,16 +103,10 @@ local function find_server_inside_nvim_cwd()
 	end
 
 	if not found_server then
-		error("No `opencode` process inside Neovim's CWD", 0)
+		error("No opencode process in cwd", 0)
 	end
 
 	return found_server
-end
-
-local M = {}
-
-function M.find_server_inside_nvim_cwd()
-	return find_server_inside_nvim_cwd()
 end
 
 return M

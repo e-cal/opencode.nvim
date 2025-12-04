@@ -93,16 +93,13 @@ local M = {}
 ---Subscribe to OpenCode SSE events
 ---Finds the port and establishes SSE connection using callbacks instead of promises
 function M.subscribe_to_sse()
-	-- Check if user configured a static port
 	local static_port = config.get("port")
 
 	if static_port then
-		-- Use static port from config
 		M.subscribe_to_sse_on_port(static_port)
 		return
 	end
 
-	-- Try to find the port synchronously first
 	local ok, found_server = pcall(server.find_server_inside_nvim_cwd)
 
 	if ok then
@@ -120,7 +117,6 @@ function M.subscribe_to_sse()
 			end)
 		end)
 	else
-		-- Port not found, show warning
 		vim.notify(
 			"Failed to find OpenCode server: " .. tostring(found_server),
 			vim.log.levels.WARN,
@@ -148,7 +144,6 @@ end
 ---Disconnect from SSE server
 function M.disconnect()
 	if sse_state.job_id then
-		local disconnected_port = sse_state.port
 		vim.fn.jobstop(sse_state.job_id)
 		sse_state = {
 			port = nil,

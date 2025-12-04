@@ -7,8 +7,7 @@ local M = {}
 ---@param opts? table User configuration options
 function M.setup(opts)
 	config.setup(opts)
-	
-	-- Auto-connect if configured
+
 	if config.get("auto_connect") then
 		vim.schedule(function()
 			M.connect()

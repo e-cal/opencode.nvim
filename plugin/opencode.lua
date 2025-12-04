@@ -19,8 +19,6 @@ vim.api.nvim_create_autocmd("User", {
 			end
 
 			if not vim.o.autoread then
-				-- Unfortunately `autoread` is kinda necessary, for `:checktime`.
-				-- Alternatively we could `:edit!` but that would lose any unsaved changes.
 				vim.notify(
 					"Please set `vim.o.autoread = true` to use `opencode.nvim` auto-reload, or disable with `auto_reload = false` in setup()",
 					vim.log.levels.WARN,
@@ -50,7 +48,6 @@ end, {
 	desc = "Connect to OpenCode SSE server for auto-reloading files",
 })
 
--- User command to disconnect from OpenCode
 vim.api.nvim_create_user_command("OpencodeDisconnect", function()
 	require("opencode").disconnect()
 end, {
