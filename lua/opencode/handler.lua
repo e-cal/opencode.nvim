@@ -154,4 +154,10 @@ function M.disconnect()
 	end
 end
 
+---Get the current connected port
+---@return number|nil
+function M.get_port()
+	return sse_state.port
+end
+
 return M

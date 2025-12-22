@@ -1,5 +1,6 @@
 local config = require("opencode.config")
 local handler = require("opencode.handler")
+local messaging = require("opencode.messaging")
 
 local M = {}
 
@@ -40,6 +41,23 @@ end
 ---@param port number Port number to connect to
 function M.connect_to_port(port)
 	handler.subscribe_to_sse_on_port(port)
+end
+
+---Send a message to OpenCode
+---@param message string The message to send
+---@param callback? fun(success: boolean, response: any) Optional callback for response
+function M.send_message(message, callback)
+	local port = handler.get_port()
+	messaging.send_message(port, message, callback)
+end
+
+---Send a smart prompt to OpenCode
+---If cursor is on a comment, sends the comment. Otherwise prompts for input.
+---Automatically prepends the current file path.
+---@param callback? fun(success: boolean, response: any) Optional callback for response
+function M.send_smart_prompt(callback)
+	local port = handler.get_port()
+	messaging.send_smart_prompt(port, callback)
 end
 
 return M

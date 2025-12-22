@@ -53,3 +53,20 @@ vim.api.nvim_create_user_command("OpencodeDisconnect", function()
 end, {
 	desc = "Disconnect from OpenCode SSE server",
 })
+
+vim.api.nvim_create_user_command("OpencodePrompt", function()
+	require("opencode").send_smart_prompt()
+end, {
+	desc = "Send a smart prompt to OpenCode (comment or input)",
+})
+
+vim.api.nvim_create_user_command("OpencodeSend", function(opts)
+	if opts.args and opts.args ~= "" then
+		require("opencode").send_message(opts.args)
+	else
+		vim.notify("Please provide a message to send", vim.log.levels.WARN, { title = "opencode" })
+	end
+end, {
+	desc = "Send a message to OpenCode",
+	nargs = "+",
+})
