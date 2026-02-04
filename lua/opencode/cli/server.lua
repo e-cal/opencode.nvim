@@ -19,9 +19,10 @@ end
 
 ---@return opencode.cli.server.Process[]
 local function get_processes_unix()
-  -- Find PIDs by command line pattern.
-  -- We filter for `--port` to avoid matching other `opencode`-related processes (LSPs etc.)
-  local pgrep = vim.system({ "pgrep", "-f", "opencode.*--port" }, { text = true }):wait()
+  -- Find all processes named "opencode". This intentionally casts a wide net;
+  -- non-server processes (LSPs, wrappers, etc.) are filtered out downstream
+  -- by checking for a listening TCP port (lsof) and a valid /path response.
+  local pgrep = vim.system({ "pgrep", "opencode" }, { text = true }):wait()
   require("opencode.util").check_system_call(pgrep, "pgrep")
 
   local processes = {}
