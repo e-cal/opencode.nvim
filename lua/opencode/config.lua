@@ -71,8 +71,27 @@ local defaults = {
     test = { prompt = "Add tests for @this", submit = true },
   },
   ask = {
+    capture = "input",
     prompt = "Ask opencode: ",
     blink_cmp_sources = { "opencode", "buffer" },
+    buffer = {
+      width_ratio = 0.7,
+      height_ratio = 0.3,
+      min_width = 60,
+      min_height = 8,
+      border = "rounded",
+      title_pos = "center",
+      linewrap = false,
+      submit_on_write = false,
+      start_insert = true,
+      submit_keys = {
+        n = { "<C-s>" },
+        i = { "<C-s>" },
+      },
+      cancel_keys = {
+        n = { "q", "<Esc>" },
+      },
+    },
     snacks = {
       icon = "󰚩 ",
       win = {

@@ -254,6 +254,8 @@ Input a prompt for `opencode`.
 - Highlights and completes contexts and `opencode` subagents.
   - Press `<Tab>` to trigger built-in completion.
   - Registers `opts.ask.blink_cmp_sources` when using `snacks.input` and `blink.cmp`.
+- Set `opts.ask.capture = "buffer"` for a larger centered floating buffer.
+  - Configure buffer behavior via `opts.ask.buffer` (for example: `submit_keys`, `cancel_keys`, `submit_on_write`, `linewrap`).
 
 ### 📝 Select — `require("opencode").select()`
 
