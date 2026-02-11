@@ -6,7 +6,7 @@ Integrate the [opencode](https://github.com/sst/opencode) AI assistant with Neov
 
 ## ✨ Features
 
-- Auto-connect to _any_ `opencode` running in Neovim's CWD, or provide an integrated instance.
+- Connect to _any_ `opencode`s running in Neovim's CWD, or provide an integrated instance.
 - Share editor context (buffer, cursor, selection, diagnostics, etc.).
 - Input prompts with completions, highlights, and normal-mode support.
 - Select prompts from a library and define your own.
@@ -24,7 +24,7 @@ Integrate the [opencode](https://github.com/sst/opencode) AI assistant with Neov
 
 ```lua
 {
-  "NickvanDyke/opencode.nvim",
+  "nickjvandyke/opencode.nvim",
   dependencies = {
     -- Recommended for `ask()` and `select()`.
     -- Required for `snacks` provider.
@@ -51,7 +51,7 @@ Integrate the [opencode](https://github.com/sst/opencode) AI assistant with Neov
     vim.keymap.set("n", "<S-C-u>", function() require("opencode").command("session.half.page.up") end,   { desc = "Scroll opencode up" })
     vim.keymap.set("n", "<S-C-d>", function() require("opencode").command("session.half.page.down") end, { desc = "Scroll opencode down" })
 
-    -- You may want these if you stick with the opinionated "<C-a>" and "<C-x>" above — otherwise consider "<leader>o…".
+    -- You may want these if you use the opinionated `<C-a>` and `<C-x>` keymaps above — otherwise consider `<leader>o…` (and remove terminal mode from the `toggle` keymap).
     vim.keymap.set("n", "+", "<C-a>", { desc = "Increment under cursor", noremap = true })
     vim.keymap.set("n", "-", "<C-x>", { desc = "Decrement under cursor", noremap = true })
   end,
@@ -79,17 +79,17 @@ programs.nixvim = {
 
 `opencode.nvim` replaces placeholders in prompts with the corresponding context:
 
-| Placeholder    | Context                                                       |
-| -------------- | ------------------------------------------------------------- |
-| `@this`          | Operator range or visual selection if any, else cursor position |
-| `@buffer`        | Current buffer                                              |
-| `@buffers`       | Open buffers                                                |
-| `@visible`       | Visible text                                                |
-| `@diagnostics`   | Current buffer diagnostics                                  |
-| `@quickfix`      | Quickfix list                                               |
-| `@diff`          | Git diff                                                    |
-| `@marks`         | Global marks                                                |
-| `@grapple`       | [grapple.nvim](https://github.com/cbochs/grapple.nvim) tags |
+| Placeholder    | Context                                                         |
+| -------------- | --------------------------------------------------------------- |
+| `@this`        | Operator range or visual selection if any, else cursor position |
+| `@buffer`      | Current buffer                                                  |
+| `@buffers`     | Open buffers                                                    |
+| `@visible`     | Visible text                                                    |
+| `@diagnostics` | Current buffer diagnostics                                      |
+| `@quickfix`    | Quickfix list                                                   |
+| `@diff`        | Git diff                                                        |
+| `@marks`       | Global marks                                                    |
+| `@grapple`     | [grapple.nvim](https://github.com/cbochs/grapple.nvim) tags     |
 
 ### Prompts
 
@@ -109,7 +109,7 @@ Select or reference prompts to review, explain, and improve your code:
 
 ### Provider
 
-You can manually run `opencode` in Neovim's CWD however you like and `opencode.nvim` will find it!
+You can manually run `opencode`s in Neovim's CWD however you like and `opencode.nvim` will find them!
 
 If `opencode.nvim` can't find an existing `opencode`, it uses the configured provider (defaulting based on availability) to manage one for you.
 
@@ -243,6 +243,19 @@ vim.g.opencode_opts = {
 </details>
 
 Please submit PRs adding new providers! 🙂
+
+#### Keymaps
+
+`opencode.nvim` sets these buffer-local keymaps in provider terminals for Neovim-like message navigation:
+
+| Keymap  | Command                  | Description                  |
+| ------- | ------------------------ | ---------------------------- |
+| `<C-u>` | `session.half.page.up`   | Scroll up half page          |
+| `<C-d>` | `session.half.page.down` | Scroll down half page        |
+| `<Esc>` | `session.interrupt`      | Interrupt                    |
+| `gg`    | `session.first`          | Go to first message          |
+| `G`     | `session.last`           | Go to last message           |
+
 
 ## 🚀 Usage
 

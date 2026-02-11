@@ -17,7 +17,7 @@ local M = {}
 M.status = nil
 
 ---@return opencode.status.Icon
-function M.statusline()
+function M.statusline_icon()
   if M.status == "idle" then
     return "󰚩"
   elseif M.status == "responding" then
@@ -29,6 +29,13 @@ function M.statusline()
   else
     return "󱚧"
   end
+end
+
+---@return string
+function M.statusline()
+  local connected_server = require("opencode.events").connected_server
+  local port = connected_server and connected_server.port
+  return M.statusline_icon() .. (port and (" :" .. tostring(port)) or "")
 end
 
 ---@param event opencode.cli.client.Event

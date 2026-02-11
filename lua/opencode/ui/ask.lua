@@ -68,7 +68,7 @@ end
 ---@param ask_opts opencode.ask.Opts
 ---@return opencode.Promise
 local function buffer_input(default, opts, ask_opts)
-  return require("opencode.promise").new(function(resolve)
+  return require("opencode.promise").new(function(resolve, reject)
     local buffer_opts = ask_opts.buffer
     local width = math.max(buffer_opts.min_width, math.floor(vim.o.columns * buffer_opts.width_ratio))
     local height = math.max(buffer_opts.min_height, math.floor(vim.o.lines * buffer_opts.height_ratio))
@@ -117,7 +117,7 @@ local function buffer_input(default, opts, ask_opts)
     highlight_buffer(buf, opts.context, ns)
 
     local done = false
-    local function finish(value)
+    local function finish(ok, value)
       if done then
         return
       end
@@ -125,7 +125,11 @@ local function buffer_input(default, opts, ask_opts)
       if vim.api.nvim_win_is_valid(win) then
         vim.api.nvim_win_close(win, true)
       end
-      resolve(value)
+      if ok then
+        resolve(value)
+      else
+        reject()
+      end
     end
 
     vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
@@ -155,7 +159,7 @@ local function buffer_input(default, opts, ask_opts)
       local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
       local value = table.concat(lines, "\n")
       if value ~= "" then
-        finish(value)
+        finish(true, value)
       else
         finish(false)
       end
@@ -233,6 +237,7 @@ function M.ask(default, opts)
   end
   opts.context = opts.context or require("opencode.context").new()
   require("opencode.cmp.blink").context = opts.context
+  local Promise = require("opencode.promise")
 
   ---@type snacks.input.Opts
   local input_opts = {
@@ -274,9 +279,12 @@ function M.ask(default, opts)
   input_opts = vim.tbl_deep_extend("force", input_opts, ask_opts.snacks)
 
   require("opencode.cli.server")
-    .get_port()
+    .get()
+    :next(function(server) ---@param server opencode.cli.server.Server
+      return server.port
+    end)
     :next(function(port) ---@param port number
-      return require("opencode.promise").new(function(resolve)
+      return Promise.new(function(resolve)
         require("opencode.cli.client").get_agents(port, function(agents)
           opts.context.agents = vim.tbl_filter(function(agent)
             return agent.mode == "subagent"
@@ -291,29 +299,17 @@ function M.ask(default, opts)
         return buffer_input(default, opts, ask_opts)
       end
 
-      return require("opencode.promise").new(function(resolve)
-        vim.ui.input(input_opts, function(value)
-          if value and value ~= "" then
-            resolve(value)
-          else
-            resolve(false)
-          end
-        end)
-      end)
+      return Promise.input(input_opts)
     end)
-    :next(function(input) ---@param input string|false
-      if input then
-        require("opencode").prompt(input, opts)
-      else
-        opts.context:resume()
-      end
-      return true
+    :next(function(input) ---@param input string
+      require("opencode").prompt(input, opts)
+      opts.context:clear()
     end)
     :catch(function(err)
-      vim.notify(err, vim.log.levels.ERROR)
-    end)
-    :finally(function()
-      opts.context:clear()
+      if err then
+        vim.notify(err, vim.log.levels.ERROR)
+      end
+      opts.context:resume()
     end)
 end
 

@@ -14,7 +14,7 @@ vim.g.opencode_opts = vim.g.opencode_opts
 ---@class opencode.Opts
 ---
 ---The port `opencode` is running on.
----If `nil`, searches for an `opencode` process in Neovim's CWD.
+---If `nil`, searches for an `opencode --port` process in Neovim's CWD.
 ---If set, `opencode.nvim` will append `--port <port>` to `provider.cmd`.
 ---@field port? number
 ---
@@ -119,6 +119,7 @@ local defaults = {
         ["prompt.clear"] = "Clear the current prompt",
       },
       provider = true,
+      server = true,
     },
     snacks = {
       preview = "preview",
@@ -154,6 +155,9 @@ local defaults = {
       win = {
         position = "right",
         enter = false, -- Stay in the editor after opening the terminal
+        on_buf = function(win)
+          require("opencode.keymaps").apply(win.buf)
+        end,
         wo = {
           winbar = "", -- Title is unnecessary - `opencode` TUI has its own footer
         },
